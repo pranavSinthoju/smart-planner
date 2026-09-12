@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model FixedEvent {
+  id        String   @id @default(cuid())
+  title     String
+  dayOfWeek Int
+  startTime String
+  endTime   String
+  createdAt DateTime @default(now())
+}
+
+model Task {
+  id             String      @id @default(cuid())
+  name           String
+  description    String?
+  deadline       DateTime
+  durationMin    Int
+  priority       Priority    @default(MEDIUM)
+  status         TaskStatus  @default(UNSCHEDULED)
+  scheduledStart DateTime?
+  scheduledEnd   DateTime?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  placements     Placement[]
+}
+
+model Placement {
+  id        String   @id @default(cuid())
+  task      Task     @relation(fields: [taskId], references: [id])
+  taskId    String
+  start     DateTime
+  end       DateTime
+  reason    String
+  createdAt DateTime @default(now())
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TaskStatus {
+  UNSCHEDULED
+  SCHEDULED
+  COMPLETED
+}
