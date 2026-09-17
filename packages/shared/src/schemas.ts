@@ -57,3 +57,10 @@ export const SchedulingContextSchema = z.object({
   newTask: TaskSchema,
 });
 export type SchedulingContext = z.infer<typeof SchedulingContextSchema>;
+
+// The scheduling LLM call's raw output shape: only the tasks whose
+// placement is new or changed, never a full replan of everything.
+export const ProposeScheduleResponseSchema = z.object({
+  placements: z.array(SchedulePlacementSchema),
+});
+export type ProposeScheduleResponse = z.infer<typeof ProposeScheduleResponseSchema>;
