@@ -101,6 +101,48 @@ button {
   width: 100%;
 }
 
+.add-task-input-row {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+
+.add-task-input-row input {
+  flex: 1;
+}
+
+.mic-button {
+  flex-shrink: 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 10px;
+  line-height: 1;
+}
+
+.mic-button.listening {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: white;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.listening-indicator {
+  color: var(--danger);
+  font-size: 0.8rem;
+  margin: 2px 0 0;
+}
+
 button {
   background: var(--accent);
   color: white;
