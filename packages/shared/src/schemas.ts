@@ -17,6 +17,9 @@ export const FixedEventSchema = z.object({
 });
 export type FixedEvent = z.infer<typeof FixedEventSchema>;
 
+export const CreateFixedEventInputSchema = FixedEventSchema.omit({ id: true });
+export type CreateFixedEventInput = z.infer<typeof CreateFixedEventInputSchema>;
+
 export const TaskSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -29,6 +32,27 @@ export const TaskSchema = z.object({
   scheduledEnd: z.coerce.date().nullable().optional(),
 });
 export type Task = z.infer<typeof TaskSchema>;
+
+// What's needed to create a task. status/scheduledStart/scheduledEnd are
+// server-assigned (a new task always starts UNSCHEDULED).
+export const CreateTaskInputSchema = z.object({
+  name: z.string(),
+  description: z.string().nullable().optional(),
+  deadline: z.coerce.date(),
+  durationMin: z.number().int().positive(),
+  priority: PrioritySchema,
+});
+export type CreateTaskInput = z.infer<typeof CreateTaskInputSchema>;
+
+// Applying a placement to a task — used both for an AI-proposed placement
+// and a manual drag-and-drop override, which is why `reason` is required
+// either way (e.g. "Moved manually by the user").
+export const ApplyPlacementInputSchema = z.object({
+  start: z.coerce.date(),
+  end: z.coerce.date(),
+  reason: z.string(),
+});
+export type ApplyPlacementInput = z.infer<typeof ApplyPlacementInputSchema>;
 
 // What the LLM extracts from a raw voice/text task entry.
 export const ParsedTaskSchema = z.object({

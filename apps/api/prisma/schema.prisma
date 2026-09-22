@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // pooled, used by Prisma Client at runtime
+  directUrl = env("DIRECT_URL") // unpooled, used for migrations
 }
 
 model FixedEvent {
@@ -33,7 +34,7 @@ model Task {
 
 model Placement {
   id        String   @id @default(cuid())
-  task      Task     @relation(fields: [taskId], references: [id])
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
   taskId    String
   start     DateTime
   end       DateTime
