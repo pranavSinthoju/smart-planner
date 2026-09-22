@@ -24,7 +24,7 @@ export const TaskSchema = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string().nullable().optional(),
-  deadline: z.coerce.date(),
+  deadline: z.coerce.date().nullable().optional(), // no deadline = flexible/low-urgency, not "unscheduled by mistake"
   durationMin: z.number().int().positive(),
   priority: PrioritySchema,
   status: TaskStatusSchema,
@@ -38,7 +38,7 @@ export type Task = z.infer<typeof TaskSchema>;
 export const CreateTaskInputSchema = z.object({
   name: z.string(),
   description: z.string().nullable().optional(),
-  deadline: z.coerce.date(),
+  deadline: z.coerce.date().nullable().optional(),
   durationMin: z.number().int().positive(),
   priority: PrioritySchema,
 });

@@ -7,6 +7,7 @@ import {
   type SchedulingContext,
 } from "@smart-planner/shared";
 import type { LLMProvider } from "./types.js";
+import { APP_TIMEZONE, formatLocal } from "../time.js";
 
 // Tasks may only be scheduled within this daily window (local time).
 const WORKING_HOURS = { start: "08:00", end: "23:00" };
@@ -70,14 +71,20 @@ You are given the user's fixed weekly commitments, a new task to place, and the 
 currently-active tasks (with their current placement, if any).
 
 Rules:
+- Always place the new task — it's the reason this call is happening.
 - Never schedule a task over any fixed event.
-- Every task must be fully scheduled to finish at or before its own deadline.
-- Only schedule within the working-hours window each day: ${WORKING_HOURS.start}-${WORKING_HOURS.end}.
+- A task with a deadline must be fully scheduled to finish at or before it.
+- A task with no deadline (null) is flexible/low-urgency — schedule it in leftover open time
+  without displacing any task that does have a deadline.
+- Only schedule within the working-hours window each day: ${WORKING_HOURS.start}-${WORKING_HOURS.end}
+  (${APP_TIMEZONE} local time). All datetimes you're given and all you output are in this timezone —
+  include its correct UTC offset explicitly in every datetime you output.
 - When there isn't enough open time for every task, higher-priority tasks and tasks with sooner
-  deadlines take precedence — move a lower-priority/later-deadline task to a different open slot
-  (still before its own deadline) rather than delaying the new or more urgent one.
+  deadlines take precedence — move a lower-priority/later-deadline/no-deadline task to a different
+  open slot (still before its own deadline, if it has one) rather than delaying the new or more
+  urgent one.
 - Prefer the earliest reasonable open slot for each task.
-- Minimize disruption: only return tasks whose placement is newly assigned or has to change.
+- Minimize disruption: besides the new task, only return tasks whose placement has to change.
   Do not include tasks whose current placement is still fine.
 - Give a short, one-sentence, user-facing reason for each placement or move.
 
@@ -100,8 +107,9 @@ export class GeminiProvider implements LLMProvider {
         systemInstruction:
           "You are a task-parsing assistant for a weekly planner app. Extract a single structured " +
           "task from the user's raw input (typed or voice-transcribed text). The current date and " +
-          `time is ${now.toISOString()} — resolve any relative dates/times against it. If the text ` +
-          "describes more than one task, capture only the primary one.",
+          `time is ${formatLocal(now)} (timezone: ${APP_TIMEZONE}) — resolve any relative dates/times ` +
+          "against it, in this timezone, and include its UTC offset in the deadline you output. If " +
+          "the text describes more than one task, capture only the primary one.",
         responseMimeType: "application/json",
         responseSchema: PARSE_TASK_SCHEMA,
       },

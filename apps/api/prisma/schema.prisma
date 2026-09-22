@@ -21,7 +21,7 @@ model Task {
   id             String      @id @default(cuid())
   name           String
   description    String?
-  deadline       DateTime
+  deadline       DateTime?
   durationMin    Int
   priority       Priority    @default(MEDIUM)
   status         TaskStatus  @default(UNSCHEDULED)

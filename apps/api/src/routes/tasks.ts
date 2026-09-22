@@ -19,7 +19,15 @@ tasksRouter.post("/tasks/parse", async (req, res) => {
 
   try {
     const parsed = await getLLMProvider().parseTask(body.data.text, new Date());
-    res.json(parsed);
+    const task = await prisma.task.create({
+      data: {
+        name: parsed.name,
+        deadline: parsed.deadline ? new Date(parsed.deadline) : null,
+        durationMin: parsed.estimatedDurationMinutes,
+        priority: parsed.priority,
+      },
+    });
+    res.status(201).json(task);
   } catch (err) {
     console.error("Task parsing failed:", err);
     res.status(502).json({ error: "Task parsing failed", message: (err as Error).message });
