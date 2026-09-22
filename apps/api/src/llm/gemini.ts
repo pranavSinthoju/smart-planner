@@ -8,6 +8,7 @@ import {
 } from "@smart-planner/shared";
 import type { LLMProvider } from "./types.js";
 import { APP_TIMEZONE, formatLocal } from "../time.js";
+import { withRetry } from "./retry.js";
 
 // Tasks may only be scheduled within this daily window (local time).
 const WORKING_HOURS = { start: "08:00", end: "23:00" };
@@ -100,20 +101,22 @@ export class GeminiProvider implements LLMProvider {
   }
 
   async parseTask(text: string, now: Date): Promise<ParsedTask> {
-    const response = await this.client.models.generateContent({
-      model: this.model,
-      contents: text,
-      config: {
-        systemInstruction:
-          "You are a task-parsing assistant for a weekly planner app. Extract a single structured " +
-          "task from the user's raw input (typed or voice-transcribed text). The current date and " +
-          `time is ${formatLocal(now)} (timezone: ${APP_TIMEZONE}) — resolve any relative dates/times ` +
-          "against it, in this timezone, and include its UTC offset in the deadline you output. If " +
-          "the text describes more than one task, capture only the primary one.",
-        responseMimeType: "application/json",
-        responseSchema: PARSE_TASK_SCHEMA,
-      },
-    });
+    const response = await withRetry(() =>
+      this.client.models.generateContent({
+        model: this.model,
+        contents: text,
+        config: {
+          systemInstruction:
+            "You are a task-parsing assistant for a weekly planner app. Extract a single structured " +
+            "task from the user's raw input (typed or voice-transcribed text). The current date and " +
+            `time is ${formatLocal(now)} (timezone: ${APP_TIMEZONE}) — resolve any relative dates/times ` +
+            "against it, in this timezone, and include its UTC offset in the deadline you output. If " +
+            "the text describes more than one task, capture only the primary one.",
+          responseMimeType: "application/json",
+          responseSchema: PARSE_TASK_SCHEMA,
+        },
+      }),
+    );
 
     const raw = response.text;
     if (!raw) throw new Error("Gemini returned an empty response while parsing a task");
@@ -126,15 +129,17 @@ export class GeminiProvider implements LLMProvider {
   }
 
   async proposeSchedule(context: SchedulingContext): Promise<SchedulePlacement[]> {
-    const response = await this.client.models.generateContent({
-      model: this.model,
-      contents: JSON.stringify(context),
-      config: {
-        systemInstruction: SCHEDULE_SYSTEM_INSTRUCTION,
-        responseMimeType: "application/json",
-        responseSchema: PROPOSE_SCHEDULE_SCHEMA,
-      },
-    });
+    const response = await withRetry(() =>
+      this.client.models.generateContent({
+        model: this.model,
+        contents: JSON.stringify(context),
+        config: {
+          systemInstruction: SCHEDULE_SYSTEM_INSTRUCTION,
+          responseMimeType: "application/json",
+          responseSchema: PROPOSE_SCHEDULE_SCHEMA,
+        },
+      }),
+    );
 
     const raw = response.text;
     if (!raw) throw new Error("Gemini returned an empty response while proposing a schedule");
