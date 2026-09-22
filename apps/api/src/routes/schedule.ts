@@ -2,6 +2,7 @@ import { Router } from "express";
 import { prisma } from "../db.js";
 import { getLLMProvider } from "../llm/index.js";
 import { formatLocal } from "../time.js";
+import { friendlyLLMErrorMessage } from "../llm/errors.js";
 
 export const scheduleRouter = Router();
 
@@ -33,6 +34,6 @@ scheduleRouter.post("/tasks/:id/schedule/propose", async (req, res) => {
     res.json({ placements });
   } catch (err) {
     console.error("Schedule proposal failed:", err);
-    res.status(502).json({ error: "Schedule proposal failed", message: (err as Error).message });
+    res.status(502).json({ error: "Schedule proposal failed", message: friendlyLLMErrorMessage(err) });
   }
 });

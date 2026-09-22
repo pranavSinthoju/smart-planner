@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ApplyPlacementInputSchema, CreateTaskInputSchema } from "@smart-planner/shared";
 import { prisma } from "../db.js";
 import { getLLMProvider } from "../llm/index.js";
+import { friendlyLLMErrorMessage } from "../llm/errors.js";
 
 export const tasksRouter = Router();
 
@@ -30,7 +31,7 @@ tasksRouter.post("/tasks/parse", async (req, res) => {
     res.status(201).json(task);
   } catch (err) {
     console.error("Task parsing failed:", err);
-    res.status(502).json({ error: "Task parsing failed", message: (err as Error).message });
+    res.status(502).json({ error: "Task parsing failed", message: friendlyLLMErrorMessage(err) });
   }
 });
 
