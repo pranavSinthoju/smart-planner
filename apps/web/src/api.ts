@@ -5,8 +5,15 @@ import type {
   Task,
 } from "@smart-planner/shared";
 
+// In dev, VITE_API_URL is unset and requests go to the same origin, where
+// Vite's dev-server proxy (vite.config.ts) forwards /api/* to localhost:4000.
+// That proxy doesn't exist in the production build — Vercel serves static
+// files with no backend of its own — so production sets VITE_API_URL to the
+// deployed API's own origin (e.g. the Railway URL).
+const API_BASE = import.meta.env.VITE_API_URL ?? "";
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${API_BASE}/api${path}`, {
     ...init,
     headers: { "Content-Type": "application/json", ...init?.headers },
   });
