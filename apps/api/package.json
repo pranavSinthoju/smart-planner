@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
+    "postinstall": "prisma generate --schema=prisma/schema.prisma",
     "build": "tsc",
     "start": "prisma migrate deploy --schema=prisma/schema.prisma && node dist/index.js",
     "prisma:generate": "prisma generate",
