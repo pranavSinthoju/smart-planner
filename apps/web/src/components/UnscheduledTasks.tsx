@@ -21,7 +21,10 @@ export function UnscheduledTasks({ tasks, onScheduled }: UnscheduledTasksProps) 
       {unscheduled.map((t) => (
         <li key={t.id} className={`priority-${t.priority.toLowerCase()}`}>
           <div className="unscheduled-task-info">
-            <span className="task-name">{t.name}</span>
+            <div className="unscheduled-task-heading">
+              <span className="task-name">{t.name}</span>
+              <span className={`priority-badge priority-${t.priority.toLowerCase()}`}>{t.priority}</span>
+            </div>
             <span className="task-deadline">
               {t.deadline ? `Due ${format(new Date(t.deadline), "EEE MMM d, h:mm a")}` : "No deadline"}
             </span>

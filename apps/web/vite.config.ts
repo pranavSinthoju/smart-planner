@@ -12,8 +12,8 @@ export default defineConfig({
         short_name: "Planner",
         start_url: "/",
         display: "standalone",
-        background_color: "#ffffff",
-        theme_color: "#2563eb",
+        background_color: "#0d0e12",
+        theme_color: "#0d0e12",
         icons: [], // TODO: add real 192x192 / 512x512 icons before shipping
       },
     }),

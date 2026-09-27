@@ -15,6 +15,7 @@ export default function App() {
 
   const fixedEvents = fixedEventsQuery.data ?? [];
   const tasks = tasksQuery.data ?? [];
+  const recentlyMovedIds = new Set(lastPlacements.map((p) => p.taskId));
 
   return (
     <div className="app">
@@ -62,7 +63,7 @@ export default function App() {
           {fixedEventsQuery.isLoading || tasksQuery.isLoading ? (
             <p>Loading…</p>
           ) : (
-            <Calendar fixedEvents={fixedEvents} tasks={tasks} />
+            <Calendar fixedEvents={fixedEvents} tasks={tasks} recentlyMovedIds={recentlyMovedIds} />
           )}
         </main>
       </div>
