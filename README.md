@@ -1,7 +1,7 @@
 # Smart Weekly Planner
 
-An AI-assisted weekly planner: tell it what you need to do — by typing or
-speaking — and it slots the task into your week around your fixed
+An AI-assisted weekly planner: tell it what you need to do, by typing or
+speaking, and it slots the task into your week around your fixed
 commitments, re-planning as new or more urgent tasks come in and explaining
 every placement it makes rather than acting as a black box.
 
@@ -32,7 +32,7 @@ inactivity — the first request after a while can take 30-60s to wake up)*
 - **Database:** PostgreSQL, hosted on [Neon](https://neon.tech) (serverless)
 - **AI:** Google Gemini (`gemini-3.6-flash`) via `@google/genai`, using
   schema-constrained structured JSON output rather than free-form prompting
-- **Voice input:** browser-native Web Speech API — no extra backend
+- **Voice input:** browser-native Web Speech API - no extra backend
 - **Deployment:** Vercel (frontend), Render (backend)
 
 ## Architecture notes
